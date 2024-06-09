@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<script src="https://code.jquery.com/jquery-1.9.1.min.js"></script>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Add Expenses</title>
+	<link rel="stylesheet" href="styles.css">
+		<script src="expenses.js"></script>
+		<script src="splitDetails.js"></script>
+		<!--<script src="clearData.js"></script>-->
+		<script src="modify.js"></script>
+</head>
+<body>
+	<div class="login-container">
+		<h2 style="text-align: center;">Modify Expenses</h2>
+		<form id="expensesForm">
+			<label for="username">Username:</label>
+			<input type="username" id="username" name="username" required>
+			
+			<label for="expenseName">Expense Name:</label>
+			<input type="expenseName" id="expenseName" name="expenseName" required>
+			
+			<label for="expenses">Expenses:</label>
+			<input type="expenses" id="expenses" name="expenses" required>
+
+			<button type="button" onclick="modifyDetails()">Modify</button>
+			<p class="all-expenses-link">
+			<a href="expenseSummary.html" class="redirect">View All Expenses</a>
+			
+			</p>
+		</form>
+		<p id="message" style="text-align: center"></p>
+	</div>
+
+</body>
+</html>
