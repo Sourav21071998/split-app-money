@@ -1,7 +1,6 @@
 HELP.md
 target/
 web-pages/
-Dockerfile
 mvnw
 mvnw.cmd
 !.mvn/wrapper/maven-wrapper.jar
