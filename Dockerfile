@@ -7,6 +7,9 @@ WORKDIR /app
 # Copy the Spring Boot application JAR file into the container
 COPY target/authentication-0.0.1-SNAPSHOT.jar split-money-snapshot.jar
 
+# Create log directory
+RUN mkdir -p /app/logs
+
 # Expose the port your application will run on
 EXPOSE 8080
 
