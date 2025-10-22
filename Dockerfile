@@ -10,6 +10,9 @@ COPY target/authentication-0.0.1-SNAPSHOT.jar split-money-snapshot.jar
 # Create log directory
 RUN mkdir -p /app/logs
 
+# Set active Spring profile for Docker
+ENV SPRING_PROFILES_ACTIVE=docker
+
 # Expose the port your application will run on
 EXPOSE 8080
 
