@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script src="https://code.jquery.com/jquery-1.9.1.min.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Expenses Summary</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="splitDetails.js"></script>
+    <script src="signout.js"></script>
+    <style>
+        .table-responsive {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        .expensesTable {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .expensesTable th, .expensesTable td {
+            padding: 10px;
+            text-align: left;
+        }
+
+        @media screen and (max-width: 600px) {
+            .expensesTable th, .expensesTable td {
+                padding: 5px;
+                font-size: 14px;
+            }
+
+            .buttons {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .buttons button {
+                margin: 5px 0;
+                width: 80%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="summary-container">
+        <h1 style="text-align: center;">Expenses Summary</h1>
+        <div class="table-responsive">
+            <table id="expensesTable" border="1" class="expensesTable">
+                <thead>
+                    <tr>
+                        <th>User ID</th>
+                        <th>Username</th>
+                        <th>Expense Name</th>
+                        <th>Expenses</th>
+                        <th>Created Date</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </div>
+        <br>
+        <p class="all-expenses-link">
+            <a href="addExpenses.html" class="redirect">Back</a>
+        </p>
+        <div class="buttons">
+            <button type="button" class="split-btn" onclick="splitDetails()">Split</button>
+            <button type="button" class="signout-btn" onclick="signOut()">Sign Out</button>
+        </div>
+        <p id="message" style="text-align: center;"></p>
+    </div>
+
+    <script>
+        async function fetchAndPopulateTable() {
+            try {
+                let token = localStorage.getItem('token');
+                const response = await fetch('http://localhost:8080/expenses/list', {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Access-Control-Allow-Origin': '*',
+                        'Access-Control-Allow-Credentials': 'true',
+                        Authorization: 'Bearer ' + token
+                    }
+                });
+                const result = await response.json();
+                console.log(result); // Log the entire response to understand its structure
+
+                const expenses = result.data; // Access the array within the data property
+
+                if (!Array.isArray(expenses)) {
+                    throw new TypeError('Expected an array but got ' + typeof expenses);
+                }
+
+                const tableBody = document.querySelector('#expensesTable tbody');
+                expenses.forEach(item => {
+                    const row = document.createElement('tr');
+
+                    const userIdCell = document.createElement('td'); 
+                    userIdCell.textContent = item.id; 
+                    row.appendChild(userIdCell);
+
+                    const usernameCell = document.createElement('td');
+                    usernameCell.textContent = item.username; 
+                    row.appendChild(usernameCell);
+
+                    const userExpenseCell = document.createElement('td'); 
+                    userExpenseCell.textContent = item.expenseName; 
+                    row.appendChild(userExpenseCell);
+
+                    const expensesCell = document.createElement('td'); 
+                    expensesCell.textContent = item.expenses;
+                    row.appendChild(expensesCell);
+
+                    const createdDateCell = document.createElement('td'); 
+                    createdDateCell.textContent = item.createdDate || 'N/A';
+                    row.appendChild(createdDateCell);
+
+                    const createdActionCell = document.createElement('td');
+                    createdActionCell.innerHTML = "<button onclick='check(" + item.id + ")' style='width:48%;'>Edit</button> <button style='width:48%;' onclick='deleteRecord(" + item.id + ")'>Delete</button>"; 
+                    row.appendChild(createdActionCell);
+
+                    tableBody.appendChild(row);
+                });
+            } catch (error) {
+                console.log('Error fetching data:', error);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', fetchAndPopulateTable);
+
+        function deleteRecord(elem) {
+            console.log("Inside delete function");
+            let token = localStorage.getItem('token');
+            const baseUrl = 'http://localhost:8080/expenses/delete';
+            const params = { id: elem };
+            const query = new URLSearchParams(params).toString();
+            const urlWithParams = `${baseUrl}?${query}`;
+
+            fetch(urlWithParams, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Access-Control-Allow-Origin': '*',
+                    'Access-Control-Allow-Credentials': 'true',
+                    Authorization: 'Bearer ' + token
+                },
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log(data);
+                if (data.message === 'Deleted successfully') {
+                    window.location.href = 'expenseSummary.html';
+                } else {
+                    document.getElementById('message').innerText = 'Exception: ' + (data.message || 'Invalid credentials');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                document.getElementById('message').innerText = 'Exception: Network error';
+            });
+        }
+
+        function check(elem) {
+            window.location.href = 'modifyExpenses.html?id=' + elem;
+            console.log(elem);
+        }
+    </script>
+</body>
+</html>
